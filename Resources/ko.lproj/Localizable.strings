@@ -19,7 +19,7 @@
 "settings.chatModel" = "채팅 모델";
 "settings.defaultModel" = "기본값 (CLI 설정)";
 "settings.fastModel" = "퀵 액션 모델 (번역/요약/설명)";
-"settings.fastHaiku" = "Haiku (빠름)";
+"settings.fastHaiku" = "Haiku";
 "settings.systemPrompt" = "시스템 프롬프트 (선택)";
 "settings.hotkeys" = "단축키";
 "settings.selectTranslate" = "선택 번역";
