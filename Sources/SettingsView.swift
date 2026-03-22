@@ -16,12 +16,6 @@ struct SettingsView: View {
                 Text(L("settings.permissions"))
                     .font(.headline)
                 HStack(spacing: 8) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
-                    Text(L("settings.cliAuth"))
-                        .font(.callout)
-                }
-                HStack(spacing: 8) {
                     Image(systemName: AXIsProcessTrusted() ? "checkmark.circle.fill" : "circle")
                         .foregroundColor(AXIsProcessTrusted() ? .green : .secondary)
                     Text(L("settings.accessibility"))
@@ -54,8 +48,8 @@ struct SettingsView: View {
                     .font(.headline)
                 Picker("", selection: $model) {
                     Text(L("settings.defaultModel")).tag("")
-                    Text("Sonnet").tag("sonnet")
                     Text("Haiku").tag("haiku")
+                    Text("Sonnet").tag("sonnet")
                     Text("Opus").tag("opus")
                 }
                 .labelsHidden()
