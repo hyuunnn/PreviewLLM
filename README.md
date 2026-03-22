@@ -10,7 +10,7 @@ Vibe coded with **Claude Opus 4.6** via [Claude Code](https://github.com/anthrop
 
 ## Screenshots
 
-| Capture Translate (⌘⇧L) | Select Translate (⌘⇧T) |
+| Capture Translate (⌘⇧.) | Select Translate (⌘⇧,) |
 |:---:|:---:|
 | ![Capture Translate](images/1.png) | ![Select Translate](images/2.png) |
 
@@ -21,8 +21,8 @@ Vibe coded with **Claude Opus 4.6** via [Claude Code](https://github.com/anthrop
 ## Features
 
 - **Toggle Panel (⌘⇧\\)** — Show/hide the floating panel
-- **Select Translate (⌘⇧T)** — Drag to select text, auto-copy + translate (requires Accessibility permission)
-- **Capture Translate (⌘⇧L)** — Captures the active window and extracts text via Vision OCR, then translates (requires Screen Recording permission)
+- **Select Translate (⌘⇧,)** — Drag to select text, auto-copy + translate (requires Accessibility permission)
+- **Capture Translate (⌘⇧.)** — Captures the active window and extracts text via Vision OCR, then translates (requires Screen Recording permission)
 - **Quick Actions** — Translate / Summarize / Explain buttons
 - **Model Selection** — Separate model choice for chat and quick actions (sonnet, haiku, opus)
 - **System Prompt** — Customize translation style (e.g., keep IT terms in original, translate English to Korean)
@@ -55,8 +55,8 @@ Permissions can be requested from the app settings (⚙).
 
 | Permission | Purpose | Required |
 |------------|---------|----------|
-| Accessibility | ⌘⇧T auto text extraction from selection | Optional (without it, manually copy first) |
-| Screen Recording | ⌘⇧L screen capture translate | Required for ⌘⇧L (app restart needed) |
+| Accessibility | ⌘⇧, auto text extraction from selection | Optional (without it, manually copy first) |
+| Screen Recording | ⌘⇧. screen capture translate | Required for ⌘⇧L (app restart needed) |
 
 ## Limitations
 
