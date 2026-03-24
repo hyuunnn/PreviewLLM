@@ -31,3 +31,5 @@
 "error.capture" = "캡처 실패: %@ — 화면 기록 권한을 확인하세요";
 "error.cliFail" = "claude CLI 실행 실패";
 "error.cliLaunch" = "claude 실행 실패";
+"error.invalidImage" = "이미지를 열 수 없습니다";
+"drop.imageToTranslate" = "이미지를 놓으면 OCR 후 번역합니다";

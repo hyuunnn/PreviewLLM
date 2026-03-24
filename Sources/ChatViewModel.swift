@@ -1,4 +1,5 @@
 import SwiftUI
+import Vision
 
 struct ChatMessage: Identifiable {
     let id = UUID()
@@ -124,6 +125,62 @@ class ChatViewModel: ObservableObject {
 
     enum QuickAction {
         case translate, summarize, explain
+    }
+
+    // MARK: - Image Drop OCR
+
+    func handleDroppedImage(_ url: URL) {
+        guard let nsImage = NSImage(contentsOf: url),
+              let cgImage = nsImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+            errorMessage = L("error.invalidImage")
+            return
+        }
+        ocrAndTranslate(cgImage)
+    }
+
+    func handleDroppedImageData(_ data: Data) {
+        guard let nsImage = NSImage(data: data),
+              let cgImage = nsImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+            errorMessage = L("error.invalidImage")
+            return
+        }
+        ocrAndTranslate(cgImage)
+    }
+
+    private func ocrAndTranslate(_ cgImage: CGImage) {
+        guard !isLoading else { return }
+        errorMessage = nil
+
+        Task.detached {
+            let request = VNRecognizeTextRequest()
+            request.recognitionLevel = .accurate
+            request.recognitionLanguages = ["en", "ko", "ja", "zh-Hans", "zh-Hant"]
+            request.usesLanguageCorrection = true
+
+            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+            let text: String
+            do {
+                try handler.perform([request])
+                text = request.results?
+                    .compactMap { $0.topCandidates(1).first?.string }
+                    .joined(separator: "\n") ?? ""
+            } catch {
+                await MainActor.run { [weak self] in
+                    self?.errorMessage = L("error.ocrFail")
+                }
+                return
+            }
+
+            let result = text
+            await MainActor.run { [weak self] in
+                guard let self else { return }
+                guard !result.isEmpty else {
+                    self.errorMessage = L("error.noText")
+                    return
+                }
+                self.sendWithAction(.translate, text: result)
+            }
+        }
     }
 
     // MARK: - Private

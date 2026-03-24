@@ -1,13 +1,16 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ChatView: View {
     @StateObject private var viewModel = ChatViewModel()
     @State private var showSettings = false
+    @State private var isDropTargeted = false
     @AppStorage("sourceLang") private var sourceLang = "auto"
     @AppStorage("targetLang") private var targetLang = "ko"
 
     private static let sourceOptions = ["auto", "en", "ko", "ja", "zh"]
     private static let targetOptions = ["ko", "en", "ja", "zh"]
+    private static let imageExtensions: Set<String> = ["png", "jpg", "jpeg", "tiff", "tif", "bmp", "gif", "heic", "webp"]
 
     var body: some View {
         VStack(spacing: 0) {
@@ -25,6 +28,14 @@ struct ChatView: View {
             }
             Divider()
             inputArea
+        }
+        .overlay {
+            if isDropTargeted {
+                dropOverlay
+            }
+        }
+        .onDrop(of: [.image, .fileURL], isTargeted: $isDropTargeted) { providers in
+            handleImageDrop(providers)
         }
         .frame(minWidth: 320, minHeight: 400)
         .sheet(isPresented: $showSettings) {
@@ -185,6 +196,69 @@ struct ChatView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
+    }
+
+    // MARK: - Image Drop
+
+    private var dropOverlay: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.ultraThinMaterial)
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(Color.accentColor, style: StrokeStyle(lineWidth: 2, dash: [8, 4]))
+                .padding(4)
+            VStack(spacing: 8) {
+                Image(systemName: "doc.text.image")
+                    .font(.system(size: 36))
+                    .foregroundColor(.accentColor)
+                Text(L("drop.imageToTranslate"))
+                    .font(.headline)
+                    .foregroundColor(.primary)
+            }
+        }
+        .padding(8)
+    }
+
+    private func handleImageDrop(_ providers: [NSItemProvider]) -> Bool {
+        guard let provider = providers.first else { return false }
+
+        if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
+            provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, _ in
+                let url: URL?
+                if let u = item as? URL {
+                    url = u
+                } else if let data = item as? Data {
+                    url = URL(dataRepresentation: data, relativeTo: nil)
+                } else {
+                    url = nil
+                }
+                guard let url, Self.imageExtensions.contains(url.pathExtension.lowercased()) else { return }
+                Task { @MainActor in
+                    viewModel.handleDroppedImage(url)
+                }
+            }
+            return true
+        }
+
+        if provider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+            provider.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { item, _ in
+                let data: Data?
+                if let d = item as? Data {
+                    data = d
+                } else if let url = item as? URL {
+                    data = try? Data(contentsOf: url)
+                } else {
+                    data = nil
+                }
+                guard let data else { return }
+                Task { @MainActor in
+                    viewModel.handleDroppedImageData(data)
+                }
+            }
+            return true
+        }
+
+        return false
     }
 }
 

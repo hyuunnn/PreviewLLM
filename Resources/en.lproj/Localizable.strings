@@ -31,3 +31,5 @@
 "error.capture" = "Capture failed: %@ — Check Screen Recording permission";
 "error.cliFail" = "claude CLI failed";
 "error.cliLaunch" = "Failed to launch claude";
+"error.invalidImage" = "Cannot open image";
+"drop.imageToTranslate" = "Drop image to OCR and translate";
