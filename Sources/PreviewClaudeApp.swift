@@ -45,7 +45,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             NotificationCenter.default.post(name: .translateClipboard, object: nil)
         }
         HotkeyManager.shared.onLiveText = { [weak self] in
-            Self.captureAndOCR { result in self?.handleOCRResult(result) }
+            Self.captureScreenAndOCR { result in self?.handleOCRResult(result) }
         }
         HotkeyManager.shared.onRegionCapture = { [weak self] in
             self?.startRegionCapture()
@@ -77,34 +77,48 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             overlay.orderOut(nil)
             self?.regionCaptureWindow = nil
             guard let cgRect else { return }
-            Self.captureRegionAndOCR(cgRect, excludingWindowID: overlayID) { result in
+            Self.captureScreenAndOCR(region: cgRect, extraExcludeWindowID: overlayID) { result in
                 self?.handleOCRResult(result)
             }
         }
         overlay.beginCapture()
     }
 
-    private static func captureRegionAndOCR(_ rect: CGRect, excludingWindowID: CGWindowID, completion: @escaping (Result<String, OCRError>) -> Void) {
+    private static func captureScreenAndOCR(region: CGRect? = nil, extraExcludeWindowID: CGWindowID? = nil, completion: @escaping (Result<String, OCRError>) -> Void) {
         Task {
             do {
                 let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)
-                let center = CGPoint(x: rect.midX, y: rect.midY)
-                guard let display = content.displays.first(where: { $0.frame.contains(center) })
-                        ?? content.displays.first else {
+                let myPID = ProcessInfo.processInfo.processIdentifier
+
+                let display: SCDisplay?
+                if let region {
+                    let center = CGPoint(x: region.midX, y: region.midY)
+                    display = content.displays.first(where: { $0.frame.contains(center) }) ?? content.displays.first
+                } else {
+                    display = content.displays.first
+                }
+                guard let display else {
                     await MainActor.run { completion(.failure(.noWindow)) }
                     return
                 }
 
-                let localRect = CGRect(x: rect.origin.x - display.frame.origin.x,
-                                       y: rect.origin.y - display.frame.origin.y,
-                                       width: rect.width, height: rect.height)
+                var excludeWindows = content.windows.filter { $0.owningApplication?.processID == myPID }
+                if let extraID = extraExcludeWindowID {
+                    excludeWindows += content.windows.filter { $0.windowID == extraID && !excludeWindows.contains(where: { $0.windowID == extraID }) }
+                }
 
-                let excludeWindows = content.windows.filter { $0.windowID == excludingWindowID }
                 let filter = SCContentFilter(display: display, excludingWindows: excludeWindows)
                 let config = SCStreamConfiguration()
-                config.sourceRect = localRect
-                config.width = Int(rect.width * 2)
-                config.height = Int(rect.height * 2)
+                if let region {
+                    config.sourceRect = CGRect(x: region.origin.x - display.frame.origin.x,
+                                               y: region.origin.y - display.frame.origin.y,
+                                               width: region.width, height: region.height)
+                    config.width = Int(region.width * 2)
+                    config.height = Int(region.height * 2)
+                } else {
+                    config.width = Int(display.frame.width * 2)
+                    config.height = Int(display.frame.height * 2)
+                }
 
                 let image = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
                 let text = try performOCR(on: image)
@@ -153,41 +167,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             case .noWindow: return L("error.noWindow")
             case .noText: return L("error.noText")
             case .captureError(let msg): return L("error.capture", msg)
-            }
-        }
-    }
-
-    private static func captureAndOCR(completion: @escaping (Result<String, OCRError>) -> Void) {
-        Task {
-            do {
-                let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: true)
-                let frontPID = NSWorkspace.shared.frontmostApplication?.processIdentifier ?? 0
-                let myPID = ProcessInfo.processInfo.processIdentifier
-                let targetPID = frontPID != myPID ? frontPID : 0
-
-                guard let target = content.windows
-                    .filter({ $0.isOnScreen })
-                    .first(where: { targetPID != 0 ? $0.owningApplication?.processID == targetPID : $0.owningApplication?.processID != myPID })
-                else {
-                    await MainActor.run { completion(.failure(.noWindow)) }
-                    return
-                }
-
-                let filter = SCContentFilter(desktopIndependentWindow: target)
-                let config = SCStreamConfiguration()
-                config.width = Int(target.frame.width * 2)
-                config.height = Int(target.frame.height * 2)
-
-                let image = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
-                let text = try performOCR(on: image)
-
-                if text.isEmpty {
-                    await MainActor.run { completion(.failure(.noText)) }
-                } else {
-                    await MainActor.run { completion(.success(text)) }
-                }
-            } catch {
-                await MainActor.run { completion(.failure(.captureError(error.localizedDescription))) }
             }
         }
     }
