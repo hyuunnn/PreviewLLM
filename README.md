@@ -14,15 +14,15 @@ Vibe coded with **Claude Opus 4.6** via [Claude Code](https://github.com/anthrop
 
 | Capture Translate (⌘⇧.) | Select Translate (⌘⇧,) |
 |:---:|:---:|
-| ![Capture Translate](images/01.png) | ![Select Translate](images/02.png) |
+| ![Capture Translate](images/1.png) | ![Select Translate](images/2.png) |
 
 | Region Capture Translate (⌘⇧') |
 |:---:|
-| ![Region Capture Translate](images/06.png) |
+| ![Region Capture Translate](images/5.png) |
 
 | Image Drop Translate | Settings |
 |:---:|:---:|
-| <img src="images/04.png"> | <img src="images/03.png"> |
+| <img src="images/4.png"> | <img src="images/3.png"> |
 
 ## Features
 
