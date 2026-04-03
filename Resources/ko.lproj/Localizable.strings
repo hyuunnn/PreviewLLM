@@ -16,8 +16,11 @@
 "settings.screenCapture" = "화면 캡처";
 "settings.requestAccess" = "권한 요청";
 "settings.permDesc" = "손쉬운 사용: ⌘⇧, 선택 번역 / 화면 캡처: ⌘⇧. 화면 캡처 번역\n화면 캡처 권한은 허용 후 앱 재시작이 필요합니다";
+"settings.provider" = "제공자";
+"settings.providerDesc" = "사용할 CLI 도구를 선택하세요";
 "settings.model" = "모델";
-"settings.modelPlaceholder" = "예: sonnet, haiku, opus, gemini-2.5-flash";
+"settings.modelPlaceholder.claude" = "예: sonnet, haiku, opus";
+"settings.modelPlaceholder.codex" = "예: gpt-4.1-mini, o4-mini, o3";
 "settings.modelDesc" = "CLI에 전달할 모델명을 입력하세요";
 "settings.systemPrompt" = "시스템 프롬프트 (선택)";
 "settings.hotkeys" = "단축키";
@@ -29,7 +32,7 @@
 "error.noWindow" = "캡처할 창을 찾을 수 없습니다";
 "error.noText" = "텍스트를 인식하지 못했습니다";
 "error.capture" = "캡처 실패: %@ — 화면 기록 권한을 확인하세요";
-"error.cliFail" = "claude CLI 실행 실패";
-"error.cliLaunch" = "claude 실행 실패";
+"error.cliFail" = "CLI 실행 실패";
+"error.cliLaunch" = "CLI 실행 실패";
 "error.invalidImage" = "이미지를 열 수 없습니다";
 "drop.imageToTranslate" = "이미지를 놓으면 OCR 후 번역합니다";

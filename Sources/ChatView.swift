@@ -268,7 +268,10 @@ private struct MessageBubbleView: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
-            if message.role == .assistant { avatar("C", color: .orange) }
+            if message.role == .assistant {
+                let provider = message.providerId.map { LLMProviderRegistry.provider(forId: $0) }
+                avatar(provider?.avatarLetter ?? "A", color: provider?.avatarColor ?? .orange)
+            }
 
             VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
                 Text(message.content.isEmpty ? "..." : message.content)

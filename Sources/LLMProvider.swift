@@ -1,0 +1,69 @@
+import SwiftUI
+
+protocol LLMProvider {
+    var id: String { get }
+    var displayName: String { get }
+    var avatarLetter: String { get }
+    var avatarColor: Color { get }
+    var defaultModel: String { get }
+    var binaryName: String { get }
+
+    func buildArguments(model: String, systemPrompt: String) -> [String]
+    func formatPrompt(_ prompt: String, systemPrompt: String) -> String
+}
+
+// MARK: - Claude
+
+struct ClaudeProvider: LLMProvider {
+    let id = "claude"
+    let displayName = "Claude"
+    let avatarLetter = "C"
+    let avatarColor = Color.orange
+    let defaultModel = "sonnet"
+    let binaryName = "claude"
+
+    func buildArguments(model: String, systemPrompt: String) -> [String] {
+        var args = ["-p", "--no-session-persistence"]
+        if !model.isEmpty { args += ["--model", model] }
+        let sp = systemPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !sp.isEmpty { args += ["--system-prompt", sp] }
+        return args
+    }
+
+    func formatPrompt(_ prompt: String, systemPrompt: String) -> String {
+        prompt
+    }
+}
+
+// MARK: - Codex
+
+struct CodexProvider: LLMProvider {
+    let id = "codex"
+    let displayName = "Codex"
+    let avatarLetter = "X"
+    let avatarColor = Color.green
+    let defaultModel = "gpt-5.4-mini"
+    let binaryName = "codex"
+
+    func buildArguments(model: String, systemPrompt: String) -> [String] {
+        var args = ["exec", "--skip-git-repo-check", "--ephemeral"]
+        if !model.isEmpty { args += ["-m", model] }
+        return args
+    }
+
+    func formatPrompt(_ prompt: String, systemPrompt: String) -> String {
+        let sp = systemPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        if sp.isEmpty { return prompt }
+        return "System instructions: \(sp)\n\n\(prompt)"
+    }
+}
+
+// MARK: - Registry
+
+enum LLMProviderRegistry {
+    static let all: [LLMProvider] = [ClaudeProvider(), CodexProvider()]
+
+    static func provider(forId id: String) -> LLMProvider {
+        all.first { $0.id == id } ?? all[0]
+    }
+}

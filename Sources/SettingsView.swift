@@ -2,9 +2,22 @@ import SwiftUI
 import ApplicationServices
 
 struct SettingsView: View {
-    @AppStorage("claudeModel") private var model = "sonnet"
+    @AppStorage("llmProvider") private var providerId = "claude"
     @AppStorage("systemPrompt") private var systemPrompt = ""
     @Environment(\.dismiss) private var dismiss
+
+    private var currentProvider: LLMProvider {
+        LLMProviderRegistry.provider(forId: providerId)
+    }
+
+    private var modelBinding: Binding<String> {
+        let key = "\(providerId)Model"
+        let defaultVal = currentProvider.defaultModel
+        return Binding(
+            get: { UserDefaults.standard.string(forKey: key) ?? defaultVal },
+            set: { UserDefaults.standard.set($0, forKey: key) }
+        )
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -43,9 +56,24 @@ struct SettingsView: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
+                Text(L("settings.provider"))
+                    .font(.headline)
+                Picker("", selection: $providerId) {
+                    ForEach(LLMProviderRegistry.all, id: \.id) { provider in
+                        Text(provider.displayName).tag(provider.id)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                Text(L("settings.providerDesc"))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
                 Text(L("settings.model"))
                     .font(.headline)
-                TextField(L("settings.modelPlaceholder"), text: $model)
+                TextField(L("settings.modelPlaceholder.\(providerId)"), text: modelBinding)
                     .textFieldStyle(.roundedBorder)
                     .font(.body)
                 Text(L("settings.modelDesc"))
@@ -87,6 +115,6 @@ struct SettingsView: View {
             }
         }
         .padding(20)
-        .frame(width: 440, height: 560)
+        .frame(width: 440, height: 620)
     }
 }

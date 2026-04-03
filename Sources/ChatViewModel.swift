@@ -5,6 +5,7 @@ struct ChatMessage: Identifiable {
     let id = UUID()
     let role: Role
     var content: String
+    var providerId: String?
 
     enum Role {
         case user, assistant
@@ -24,7 +25,13 @@ class ChatViewModel: ObservableObject {
     private var observer: Any?
     private var ocrErrorObserver: Any?
 
-    private var model: String { UserDefaults.standard.string(forKey: "claudeModel") ?? "sonnet" }
+    private var currentProvider: LLMProvider {
+        let id = UserDefaults.standard.string(forKey: "llmProvider") ?? "claude"
+        return LLMProviderRegistry.provider(forId: id)
+    }
+    private func model(for provider: LLMProvider) -> String {
+        UserDefaults.standard.string(forKey: "\(provider.id)Model") ?? provider.defaultModel
+    }
     private var systemPrompt: String { UserDefaults.standard.string(forKey: "systemPrompt") ?? "" }
     private var sourceLang: String { UserDefaults.standard.string(forKey: "sourceLang") ?? "auto" }
     private var targetLang: String { UserDefaults.standard.string(forKey: "targetLang") ?? "ko" }
@@ -33,10 +40,18 @@ class ChatViewModel: ObservableObject {
         "auto": "Auto", "en": "English", "ko": "한국어", "ja": "日本語", "zh": "中文"
     ]
 
-    private static let shellSetup: (path: String, env: [String: String]) = {
+    private static var resolvedShells: [String: (path: String, env: [String: String])] = [:]
+
+    private static func resolveShell(for binaryName: String) -> (path: String, env: [String: String]) {
+        if let cached = resolvedShells[binaryName] { return cached }
+
+        guard binaryName.allSatisfy({ $0.isLetter || $0.isNumber || $0 == "-" }) else {
+            return ("/usr/local/bin/\(binaryName)", [:])
+        }
+
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/zsh")
-        process.arguments = ["-li", "-c", "which claude && echo __ENV_SEPARATOR__ && env"]
+        process.arguments = ["-li", "-c", "which \(binaryName) && echo __ENV_SEPARATOR__ && env"]
         let pipe = Pipe()
         process.standardOutput = pipe
         process.standardError = Pipe()
@@ -45,7 +60,7 @@ class ChatViewModel: ObservableObject {
         let output = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
         let parts = output.components(separatedBy: "__ENV_SEPARATOR__\n")
 
-        let path = parts.first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "/usr/local/bin/claude"
+        let path = parts.first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "/usr/local/bin/\(binaryName)"
 
         var env: [String: String] = [:]
         if parts.count > 1 {
@@ -55,8 +70,10 @@ class ChatViewModel: ObservableObject {
                 }
             }
         }
-        return (path.isEmpty ? "/usr/local/bin/claude" : path, env)
-    }()
+        let result = (path.isEmpty ? "/usr/local/bin/\(binaryName)" : path, env)
+        resolvedShells[binaryName] = result
+        return result
+    }
 
     init() {
         observer = NotificationCenter.default.addObserver(
@@ -88,8 +105,10 @@ class ChatViewModel: ObservableObject {
     func sendMessage(_ text: String? = nil) {
         let content = (text ?? inputText).trimmingCharacters(in: .whitespacesAndNewlines)
         guard !content.isEmpty else { return }
-        let idx = appendMessages(userContent: content)
-        runClaude(prompt: buildPrompt(currentMessage: content), responseIndex: idx)
+        let provider = currentProvider
+        cancelCurrentRequest()
+        let idx = appendMessages(userContent: content, provider: provider)
+        runLLM(prompt: buildPrompt(currentMessage: content), responseIndex: idx, provider: provider)
     }
 
     func sendWithAction(_ action: QuickAction, text: String) {
@@ -108,8 +127,10 @@ class ChatViewModel: ObservableObject {
         case .summarize: prompt = "<text> 안의 텍스트를 요약만 해. 부연설명 없이 요약 결과만 출력해.\n\n<text>\(text)</text>"
         case .explain: prompt = "<text> 안의 텍스트를 쉽게 설명해줘:\n\n<text>\(text)</text>"
         }
-        let idx = appendMessages(userContent: prompt)
-        runClaude(prompt: buildPrompt(currentMessage: prompt), responseIndex: idx)
+        let provider = currentProvider
+        cancelCurrentRequest()
+        let idx = appendMessages(userContent: prompt, provider: provider)
+        runLLM(prompt: buildPrompt(currentMessage: prompt), responseIndex: idx, provider: provider)
     }
 
     func pasteFromClipboard() -> String? {
@@ -184,13 +205,13 @@ class ChatViewModel: ObservableObject {
 
     // MARK: - Private
 
-    private func appendMessages(userContent: String) -> Int {
+    private func appendMessages(userContent: String, provider: LLMProvider) -> Int {
         messages.append(ChatMessage(role: .user, content: userContent))
         inputText = ""
         isLoading = true
         isCancelled = false
         errorMessage = nil
-        messages.append(ChatMessage(role: .assistant, content: ""))
+        messages.append(ChatMessage(role: .assistant, content: "", providerId: provider.id))
         return messages.count - 1
     }
 
@@ -210,19 +231,18 @@ class ChatViewModel: ObservableObject {
         return parts.joined(separator: "\n\n")
     }
 
-    private func runClaude(prompt: String, responseIndex idx: Int) {
-        cancelCurrentRequest()
+    private func runLLM(prompt: String, responseIndex idx: Int, provider: LLMProvider) {
         isLoading = true
 
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: Self.shellSetup.path)
-        process.environment = Self.shellSetup.env
+        let currentModel = model(for: provider)
+        let shell = Self.resolveShell(for: provider.binaryName)
 
-        var args = ["-p"]
-        if !model.isEmpty { args += ["--model", model] }
-        let sp = systemPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !sp.isEmpty { args += ["--system-prompt", sp] }
-        process.arguments = args
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: shell.path)
+        process.environment = shell.env
+        process.arguments = provider.buildArguments(model: currentModel, systemPrompt: systemPrompt)
+
+        let formattedPrompt = provider.formatPrompt(prompt, systemPrompt: systemPrompt)
 
         let inputPipe = Pipe()
         let outputPipe = Pipe()
@@ -265,7 +285,7 @@ class ChatViewModel: ObservableObject {
         do {
             try process.run()
             currentProcess = process
-            inputPipe.fileHandleForWriting.write(Data(prompt.utf8))
+            inputPipe.fileHandleForWriting.write(Data(formattedPrompt.utf8))
             inputPipe.fileHandleForWriting.closeFile()
         } catch {
             isLoading = false

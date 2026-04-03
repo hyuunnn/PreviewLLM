@@ -16,8 +16,11 @@
 "settings.screenCapture" = "Screen Capture";
 "settings.requestAccess" = "Request Access";
 "settings.permDesc" = "Accessibility: ⌘⇧, Select Translate / Screen Capture: ⌘⇧. Capture Translate\nScreen capture requires app restart after granting permission";
+"settings.provider" = "Provider";
+"settings.providerDesc" = "Select which CLI tool to use";
 "settings.model" = "Model";
-"settings.modelPlaceholder" = "e.g. sonnet, haiku, opus, gemini-2.5-flash";
+"settings.modelPlaceholder.claude" = "e.g. sonnet, haiku, opus";
+"settings.modelPlaceholder.codex" = "e.g. gpt-4.1-mini, o4-mini, o3";
 "settings.modelDesc" = "Enter model name to pass to CLI";
 "settings.systemPrompt" = "System Prompt (optional)";
 "settings.hotkeys" = "Hotkeys";
@@ -29,7 +32,7 @@
 "error.noWindow" = "No window found to capture";
 "error.noText" = "No text recognized";
 "error.capture" = "Capture failed: %@ — Check Screen Recording permission";
-"error.cliFail" = "claude CLI failed";
-"error.cliLaunch" = "Failed to launch claude";
+"error.cliFail" = "CLI failed";
+"error.cliLaunch" = "Failed to launch CLI";
 "error.invalidImage" = "Cannot open image";
 "drop.imageToTranslate" = "Drop image to OCR and translate";
