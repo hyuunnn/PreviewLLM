@@ -1,8 +1,8 @@
-# PreviewClaude
+# PreviewLLM
 
-A Claude translation panel designed to use on top of macOS Preview app.
+A multi-LLM translation panel designed to use on top of macOS Preview app.
 
-Uses [`claude -p`](https://code.claude.com/docs/ko/cli-reference) CLI, so no separate API key is needed — it uses your existing Claude authentication.
+Supports multiple LLM CLI tools (Claude, Codex, and extensible to others). No separate API key needed — it reuses your existing CLI authentication.
 
 OCR-extracted text often contains broken line breaks, missing characters, or garbled words, which degrades translation quality when using conventional translators. By using an LLM, the app understands context and delivers natural translations.
 
@@ -32,7 +32,8 @@ Vibe coded with **Claude Opus 4.6** via [Claude Code](https://github.com/anthrop
 - **Region Capture Translate (⌘⇧')** — Drag to select a screen region, extracts text via Vision OCR, then translates (requires Screen Recording permission)
 - **Image Drop Translate** — Drag & drop an image onto the panel to extract text via Vision OCR and translate
 - **Quick Actions** — Translate / Summarize / Explain buttons
-- **Model Selection** — Free-form model name input (default: sonnet)
+- **Provider Selection** — Switch between Claude, Codex, and more via Settings
+- **Model Selection** — Free-form model name input (per-provider, e.g., sonnet, gpt-5.4-mini)
 - **System Prompt** — Customize translation style (e.g., keep IT terms in original)
 - **Localized UI** — Automatically switches between Korean/English based on system language
 - **Floating Panel** — Always-on-top window for use alongside Preview
@@ -40,7 +41,9 @@ Vibe coded with **Claude Opus 4.6** via [Claude Code](https://github.com/anthrop
 ## Requirements
 
 - **macOS 14.0+**
-- **[Claude Code CLI](https://github.com/anthropics/claude-code)** installed and authenticated
+- At least one supported LLM CLI installed and authenticated:
+  - [Claude Code CLI](https://github.com/anthropics/claude-code) (`claude`)
+  - [Codex CLI](https://github.com/openai/codex) (`codex`)
 - Swift 5.10+
 
 ## Build & Install
@@ -50,10 +53,10 @@ Vibe coded with **Claude Opus 4.6** via [Claude Code](https://github.com/anthrop
 bash build.sh
 
 # Run
-open build/PreviewClaude.app
+open build/PreviewLLM.app
 
 # Install (copy to Applications)
-cp -r build/PreviewClaude.app /Applications/
+cp -r build/PreviewLLM.app /Applications/
 ```
 
 ## Permissions
@@ -67,8 +70,9 @@ Permissions can be requested from the app settings (⚙).
 
 ## Limitations
 
-- **Claude only** — Uses [`claude -p`](https://code.claude.com/docs/ko/cli-reference) CLI, so Claude Code must be installed ([Thariq's Post](https://x.com/trq212/status/2024212380142752025), [archive](images/post.png))
 - **macOS only** — Uses macOS native frameworks: ScreenCaptureKit, Vision, Accessibility API
+- Requires at least one supported LLM CLI tool installed
+- Claude's `claude -p` usage context: ([Thariq's Post](https://x.com/trq212/status/2024212380142752025), [archive](images/post.png))
 - Capture translate uses the same Vision OCR engine as macOS Live Text
-- Screen capture automatically excludes the PreviewClaude panel, so it works even while the panel is open
+- Screen capture automatically excludes the PreviewLLM panel, so it works even while the panel is open
 

@@ -1,8 +1,8 @@
-# PreviewClaude
+# PreviewLLM
 
-macOS 미리보기(Preview) 앱 위에서 사용하기 위한 Claude 번역 패널입니다.
+macOS 미리보기(Preview) 앱 위에서 사용하기 위한 멀티 LLM 번역 패널입니다.
 
-[`claude -p`](https://code.claude.com/docs/ko/cli-reference) CLI를 활용하므로 별도 API 키 없이 기존 Claude 인증을 그대로 사용합니다.
+여러 LLM CLI 도구(Claude, Codex 등)를 지원하며, 별도 API 키 없이 기존 CLI 인증을 그대로 사용합니다.
 
 OCR로 추출한 텍스트는 잘못된 개행, 누락된 글자, 깨진 단어 등이 포함되는 경우가 많아 번역기를 사용하면 번역 품질이 떨어집니다. LLM을 사용하면 문맥을 이해하여 자연스러운 번역을 제공합니다.
 
@@ -30,7 +30,8 @@ OCR로 추출한 텍스트는 잘못된 개행, 누락된 글자, 깨진 단어 
 - **영역 캡처 번역 (⌘⇧')** — 드래그로 화면 영역을 선택하고 Vision OCR로 텍스트 추출 후 번역 (화면 기록 권한 필요)
 - **이미지 드롭 번역** — 이미지를 패널에 드래그앤드롭하면 Vision OCR로 텍스트를 추출하고 번역
 - **퀵 액션** — 번역 / 요약 / 설명 버튼
-- **모델 선택** — 자유 입력 방식의 모델명 설정 (기본값: sonnet)
+- **제공자 선택** — 설정에서 Claude, Codex 등 전환 가능
+- **모델 선택** — 자유 입력 방식의 모델명 설정 (제공자별 독립, 예: sonnet, gpt-5.4-mini)
 - **시스템 프롬프트** — 번역 스타일 커스텀 가능 (ex: IT 용어 원문 유지)
 - **다국어 UI** — 시스템 언어에 따라 한국어/영어 자동 전환
 - **플로팅 패널** — 항상 위에 떠 있어 미리보기와 함께 사용 가능
@@ -38,7 +39,9 @@ OCR로 추출한 텍스트는 잘못된 개행, 누락된 글자, 깨진 단어 
 ## 요구사항
 
 - **macOS 14.0+**
-- **[Claude Code CLI](https://github.com/anthropics/claude-code)** 설치 및 인증 완료
+- 지원되는 LLM CLI 도구 중 하나 이상 설치 및 인증 완료:
+  - [Claude Code CLI](https://github.com/anthropics/claude-code) (`claude`)
+  - [Codex CLI](https://github.com/openai/codex) (`codex`)
 - Swift 5.10+
 
 ## 빌드 및 설치
@@ -48,10 +51,10 @@ OCR로 추출한 텍스트는 잘못된 개행, 누락된 글자, 깨진 단어 
 bash build.sh
 
 # 실행
-open build/PreviewClaude.app
+open build/PreviewLLM.app
 
 # 설치 (Applications 폴더로 복사)
-cp -r build/PreviewClaude.app /Applications/
+cp -r build/PreviewLLM.app /Applications/
 ```
 
 ## 권한 설정
@@ -65,8 +68,9 @@ cp -r build/PreviewClaude.app /Applications/
 
 ## 제한사항
 
-- **Claude 전용** — [`claude -p`](https://code.claude.com/docs/ko/cli-reference) CLI를 사용하므로 Claude Code가 설치되어 있어야 합니다 ([Thariq's Post](https://x.com/trq212/status/2024212380142752025), [archive](images/post.png))
 - **macOS 전용** — ScreenCaptureKit, Vision, Accessibility API 등 macOS 네이티브 프레임워크를 사용합니다
+- 지원되는 LLM CLI 도구 중 하나 이상 설치 필요
+- Claude의 `claude -p` 사용 관련: ([Thariq's Post](https://x.com/trq212/status/2024212380142752025), [archive](images/post.png))
 - 화면 캡처 번역은 macOS의 Live Text와 동일한 Vision OCR 엔진을 사용합니다
-- 화면 캡처 시 PreviewClaude 패널은 자동으로 제외되므로, 패널을 열어놓은 상태에서도 캡처가 가능합니다
+- 화면 캡처 시 PreviewLLM 패널은 자동으로 제외되므로, 패널을 열어놓은 상태에서도 캡처가 가능합니다
 

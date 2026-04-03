@@ -4,11 +4,11 @@ import Vision
 import ScreenCaptureKit
 
 @main
-struct PreviewClaudeApp: App {
+struct PreviewLLMApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        MenuBarExtra("PreviewClaude", systemImage: "text.bubble") {
+        MenuBarExtra("PreviewLLM", systemImage: "text.bubble") {
             Button("⌘⇧\\  \(L("menu.toggle"))") {
                 appDelegate.panelController.toggle()
             }

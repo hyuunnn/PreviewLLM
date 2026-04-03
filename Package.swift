@@ -2,12 +2,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "PreviewClaude",
+    name: "PreviewLLM",
     defaultLocalization: "ko",
     platforms: [.macOS(.v14)],
     targets: [
         .executableTarget(
-            name: "PreviewClaude",
+            name: "PreviewLLM",
             path: ".",
             exclude: ["build", "build.sh", "README.md", "README_ko.md", "images"],
             sources: ["Sources"],

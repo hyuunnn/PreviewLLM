@@ -1,7 +1,7 @@
 import Foundation
 
 private let localBundle: Bundle = {
-    let bundleName = "PreviewClaude_PreviewClaude"
+    let bundleName = "PreviewLLM_PreviewLLM"
     if let url = Bundle.main.resourceURL?.appendingPathComponent(bundleName + ".bundle"),
        let bundle = Bundle(url: url) {
         return bundle

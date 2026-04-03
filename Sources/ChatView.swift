@@ -45,7 +45,7 @@ struct ChatView: View {
 
     private var toolbar: some View {
         HStack {
-            Text("PreviewClaude")
+            Text("PreviewLLM")
                 .font(.headline)
             Spacer()
             Button(action: { viewModel.clearChat() }) {
