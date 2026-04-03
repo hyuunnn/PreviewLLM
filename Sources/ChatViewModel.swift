@@ -108,7 +108,7 @@ class ChatViewModel: ObservableObject {
         let provider = currentProvider
         cancelCurrentRequest()
         let idx = appendMessages(userContent: content, provider: provider)
-        runLLM(prompt: buildPrompt(currentMessage: content), responseIndex: idx, provider: provider)
+        runLLM(prompt: content, responseIndex: idx, provider: provider)
     }
 
     func sendWithAction(_ action: QuickAction, text: String) {
@@ -130,7 +130,7 @@ class ChatViewModel: ObservableObject {
         let provider = currentProvider
         cancelCurrentRequest()
         let idx = appendMessages(userContent: prompt, provider: provider)
-        runLLM(prompt: buildPrompt(currentMessage: prompt), responseIndex: idx, provider: provider)
+        runLLM(prompt: prompt, responseIndex: idx, provider: provider)
     }
 
     func pasteFromClipboard() -> String? {
@@ -220,15 +220,6 @@ class ChatViewModel: ObservableObject {
         currentProcess?.terminate()
         currentProcess = nil
         isLoading = false
-    }
-
-    private func buildPrompt(currentMessage: String) -> String {
-        let history = Array(messages.dropLast(2).suffix(6))
-        guard !history.isEmpty else { return currentMessage }
-
-        var parts = history.map { "\($0.role == .user ? "Human" : "Assistant"): \($0.content)" }
-        parts.append("Human: \(currentMessage)")
-        return parts.joined(separator: "\n\n")
     }
 
     private func runLLM(prompt: String, responseIndex idx: Int, provider: LLMProvider) {
