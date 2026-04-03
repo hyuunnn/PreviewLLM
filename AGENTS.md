@@ -29,6 +29,9 @@ No test suite — validate by building and running manually.
 - Guess or infer CLI flags — always verify from actual help output or docs
 - Write code for a new LLM provider before testing the CLI commands manually
 
+### Known failure mode — DO NOT REPEAT
+> In a previous session, the agent skipped docs verification for `claude` CLI and missed the `--system-prompt` flag entirely because it **only exists in official docs, not in `--help` output**. This caused a broken implementation that had to be completely redone. `--help` is never sufficient on its own.
+
 ## Adding a New LLM Provider
 
 Supported providers are defined in `Sources/LLMProvider.swift` → `LLMProviderRegistry.all`.
@@ -38,7 +41,7 @@ Supported providers are defined in `Sources/LLMProvider.swift` → `LLMProviderR
 1. **Research** (complete ALL sub-items before proceeding to Test):
    - [ ] Run `which <cli>` and `<cli> --help`
    - [ ] **MANDATORY**: Check official documentation for: env vars, config files, system prompt flags, session management. `--help` output is incomplete — **do not skip this step.**
-     - For large pages (GitHub README, 400KB+), use `curl -sL <raw-url> | grep -iA10 "<keyword>"` instead of WebFetch to avoid context bloat
+     - For large pages (GitHub README, 400KB+), use `curl -sL <raw-url> | grep -iC15 "<keyword>"` instead of WebFetch to avoid context bloat
    - [ ] Report findings to user: non-interactive mode, model flag, system prompt mechanism, session persistence opt-out
 2. **Test** — Execute actual commands to verify stdin input, stdout output, model flag, and system prompt delivery all work correctly.
 3. **Implement** — Create a struct conforming to `LLMProvider` in `Sources/LLMProvider.swift`:
