@@ -37,7 +37,10 @@ Currently supported:
 
 ### Steps
 
-1. **Research** — Run `which <cli>` and `<cli> --help`. Also check the CLI's official documentation website for features not listed in `--help` (e.g. env vars, config files). Identify: non-interactive mode, model flag, system prompt mechanism, session persistence opt-out.
+1. **Research** (complete ALL sub-items before proceeding to Test):
+   - [ ] Run `which <cli>` and `<cli> --help`
+   - [ ] WebFetch the official documentation website (e.g. `<cli-name>cli.com/docs`, GitHub README). Investigate features NOT listed in `--help`: env vars, config files, system prompt mechanism
+   - [ ] Report findings to user: non-interactive mode, model flag, system prompt mechanism, session persistence opt-out
 2. **Test** — Execute actual commands to verify stdin input, stdout output, model flag, and system prompt delivery all work correctly.
 3. **Implement** — Create a struct conforming to `LLMProvider` in `Sources/LLMProvider.swift`:
    - Set `id`, `displayName`, `avatarLetter`, `avatarColor`, `defaultModel`, `binaryName`
