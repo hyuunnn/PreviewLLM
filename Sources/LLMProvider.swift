@@ -69,8 +69,32 @@ struct GeminiProvider: LLMProvider {
 
     func buildArguments(model: String, systemPrompt: String) -> [String] {
         let sp = systemPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
-        var args = ["-p", sp]
+        var args = ["-p", sp, "--output-format", "text"]
         if !model.isEmpty { args += ["-m", model] }
+        return args
+    }
+
+    func formatPrompt(_ prompt: String, systemPrompt: String) -> String {
+        prompt
+    }
+}
+
+// MARK: - Qwen
+
+struct QwenProvider: LLMProvider {
+    let id = "qwen"
+    let displayName = "Qwen"
+    let avatarLetter = "Q"
+    let avatarColor = Color.purple
+    let defaultModel = "qwen-flash-latest"
+    let binaryName = "qwen"
+
+    func buildArguments(model: String, systemPrompt: String) -> [String] {
+        var args = ["-p", "--output-format", "text"]
+        if !model.isEmpty { args += ["-m", model] }
+        let sp = systemPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !sp.isEmpty { args += ["--system-prompt", sp] }
+        args += ["--chat-recording", "false"]
         return args
     }
 
@@ -82,7 +106,7 @@ struct GeminiProvider: LLMProvider {
 // MARK: - Registry
 
 enum LLMProviderRegistry {
-    static let all: [LLMProvider] = [ClaudeProvider(), CodexProvider(), GeminiProvider()]
+    static let all: [LLMProvider] = [ClaudeProvider(), CodexProvider(), GeminiProvider(), QwenProvider()]
 
     static func provider(forId id: String) -> LLMProvider {
         all.first { $0.id == id } ?? all[0]
