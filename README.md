@@ -34,6 +34,7 @@ Vibe coded with **Claude Opus 4.6** via [Claude Code](https://github.com/anthrop
 - **Quick Actions** — Translate / Summarize / Explain buttons
 - **Provider Selection** — Switch between Claude, Codex, Gemini, Qwen via Settings
 - **Model Selection** — Free-form model name input (per-provider, e.g., sonnet, gpt-5.4-mini, gemini-2.5-flash, qwen-flash-latest)
+  - Claude and Codex reasoning effort is set to `low` for fast translation responses
 - **System Prompt** — Customize translation style (e.g., keep IT terms in original)
 - **Localized UI** — Automatically switches between Korean/English based on system language
 - **Floating Panel** — Always-on-top window for use alongside Preview
