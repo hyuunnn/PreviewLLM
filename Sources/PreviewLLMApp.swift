@@ -36,9 +36,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self?.panelController.toggle()
         }
         HotkeyManager.shared.onTranslate = { [weak self] in
-            if AXIsProcessTrusted(), let text = Self.getSelectedText(), !text.isEmpty {
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(text, forType: .string)
+            if AXIsProcessTrusted() {
+                if let text = Self.getSelectedText(), !text.isEmpty {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(text, forType: .string)
+                } else {
+                    Self.simulateCopy()
+                }
             }
             self?.panelController.show()
             NotificationCenter.default.post(name: .translateClipboard, object: nil)
@@ -131,6 +135,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 await MainActor.run { completion(.failure(.captureError(error.localizedDescription))) }
             }
         }
+    }
+
+    private static func simulateCopy() {
+        let src = CGEventSource(stateID: .hidSystemState)
+        let keyDown = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: true)   // 0x08 = kVK_ANSI_C
+        let keyUp   = CGEvent(keyboardEventSource: src, virtualKey: 0x08, keyDown: false)
+        keyDown?.flags = .maskCommand
+        keyUp?.flags   = .maskCommand
+        keyDown?.post(tap: .cghidEventTap)
+        keyUp?.post(tap: .cghidEventTap)
+        usleep(100_000) // 100ms — 대상 앱이 클립보드에 쓸 시간
     }
 
     private static func getSelectedText() -> String? {
