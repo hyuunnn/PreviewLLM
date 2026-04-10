@@ -73,6 +73,13 @@ cp -r build/TranslatePanel.app /Applications/
 | 손쉬운 사용 | ⌘⇧, 드래그 텍스트 자동 추출 | 선택 (없으면 수동 복사 후 번역) |
 | 화면 기록 | ⌘⇧. 화면 캡처, ⌘⇧' 영역 캡처 번역 | ⌘⇧. / ⌘⇧' 사용 시 필수 (앱 재시작 필요) |
 
+## 추천 앱
+
+논문 읽기 및 관리에 TranslatePanel과 함께 사용하기 좋은 앱입니다:
+
+- [Skim](https://skim-app.sourceforge.io/) — macOS PDF 리더
+- [Zotero](https://www.zotero.org/) — 문헌 관리 도구
+
 ## 제한사항
 
 - **macOS 전용** — ScreenCaptureKit, Vision, Accessibility API 등 macOS 네이티브 프레임워크를 사용합니다

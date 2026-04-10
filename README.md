@@ -75,6 +75,13 @@ Permissions can be requested from the app settings (⚙).
 | Accessibility | ⌘⇧, auto text extraction from selection | Optional (without it, manually copy first) |
 | Screen Recording | ⌘⇧. screen capture, ⌘⇧' region capture translate | Required for ⌘⇧. / ⌘⇧' (app restart needed) |
 
+## Recommended Apps
+
+These apps work great alongside TranslatePanel for reading and managing academic papers:
+
+- [Skim](https://skim-app.sourceforge.io/) — PDF reader for macOS
+- [Zotero](https://www.zotero.org/) — Reference manager
+
 ## Limitations
 
 - **macOS only** — Uses macOS native frameworks: ScreenCaptureKit, Vision, Accessibility API
