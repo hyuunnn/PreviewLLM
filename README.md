@@ -77,10 +77,10 @@ Permissions can be requested from the app settings (⚙).
 
 ## Recommended Apps
 
-These apps work great alongside TranslatePanel for reading and managing academic papers:
+These apps work great with TranslatePanel:
 
-- [Skim](https://skim-app.sourceforge.io/) — PDF reader for macOS
-- [Zotero](https://www.zotero.org/) — Reference manager
+- [Skim](https://skim-app.sourceforge.io/)
+- [Zotero](https://www.zotero.org/)
 
 ## Limitations
 

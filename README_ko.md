@@ -75,10 +75,10 @@ cp -r build/TranslatePanel.app /Applications/
 
 ## 추천 앱
 
-논문 읽기 및 관리에 TranslatePanel과 함께 사용하기 좋은 앱입니다:
+TranslatePanel과 함께 사용하기 좋은 앱입니다:
 
-- [Skim](https://skim-app.sourceforge.io/) — macOS PDF 리더
-- [Zotero](https://www.zotero.org/) — 문헌 관리 도구
+- [Skim](https://skim-app.sourceforge.io/)
+- [Zotero](https://www.zotero.org/)
 
 ## 제한사항
 
