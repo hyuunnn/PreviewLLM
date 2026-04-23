@@ -148,7 +148,7 @@ struct CopilotProvider: LLMProvider {
     let binaryName = "copilot"
 
     func buildArguments(model: String, systemPrompt: String) -> [String] {
-        var args = ["-s", "--no-custom-instructions", "--output-format", "text"]
+        var args = ["-s", "--no-custom-instructions", "--disable-builtin-mcps", "--output-format", "text"]
         if !model.isEmpty { args += ["--model", model] }
         return args
     }
