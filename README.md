@@ -83,6 +83,11 @@ These apps work great with TranslatePanel:
 - [Skim](https://skim-app.sourceforge.io/)
 - [Zotero](https://www.zotero.org/)
 
+## Recommended Models
+
+- LM Studio
+  - gemma4 e4b, 31b ([reference](https://github.com/vEduardovich/dodari#system-requirements))
+
 ## Limitations
 
 - **macOS only** — Uses macOS native frameworks: ScreenCaptureKit, Vision, Accessibility API

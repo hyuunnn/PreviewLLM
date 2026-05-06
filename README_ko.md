@@ -81,6 +81,11 @@ TranslatePanel과 함께 사용하기 좋은 앱입니다:
 - [Skim](https://skim-app.sourceforge.io/)
 - [Zotero](https://www.zotero.org/)
 
+## 추천 모델
+
+- LM Studio
+  - gemma4 e4b, 31b ([참고](https://github.com/vEduardovich/dodari#system-requirements))
+
 ## 제한사항
 
 - **macOS 전용** — ScreenCaptureKit, Vision, Accessibility API 등 macOS 네이티브 프레임워크를 사용합니다
